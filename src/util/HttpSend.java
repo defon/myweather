@@ -16,7 +16,7 @@ public class HttpSend
 	
 	public static void sendHttpRequest(final String strUrl,final String strData,final String strMethod,final HttpCallbackListener listener)
 	{
-		new Thread( new Runnable() 
+		Thread thrd = new Thread( new Runnable() 
 		{
 			@Override
 			public void run() 
@@ -52,7 +52,28 @@ public class HttpSend
 						conn.disconnect();
 				}
 			}
-		}).start();
+		});
+		
+		thrd.start();
+	
+		// listener为空表示为同步模式，等线程退出再返回
+		if(listener == null)
+		{
+			while(true)
+			{
+				if(thrd.isAlive() == false)
+					break;
+				
+				 try 
+				 {
+					 Thread.sleep(1000);
+			     }
+				 catch (InterruptedException e) 
+				 {
+					 e.printStackTrace(); 
+			     }
+			}	
+		}
 	}
 	
 	public static void setConnectionTimeout(int nTimeout)
