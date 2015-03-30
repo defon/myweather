@@ -9,8 +9,11 @@ import com.example.myweather.ProvinceData;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
+import util.WeatherHttpDataHelper;
 
 class MyWeatherDB 
 {
@@ -21,6 +24,8 @@ class MyWeatherDB
 	private static MyWeatherDB s_Instance;
 	
 	private SQLiteDatabase m_db;
+	
+	private Context m_SavedContext;
 	
 	private MyWeatherDB(Context context)
 	{
@@ -34,6 +39,36 @@ class MyWeatherDB
 			s_Instance = new MyWeatherDB(context);
 		
 		return  s_Instance;  
+	}
+	
+	public void initData()
+	{
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(m_SavedContext);		
+		String strLastGetTime = pref.getString("lastUpdateTime","");	// 如果已经获取过了，跳过
+		if(!strLastGetTime.isEmpty())
+			return;
+		
+		List<ProvinceData> lstProvince = getProvinceData();
+		if(lstProvince.isEmpty())
+			lstProvince = WeatherHttpDataHelper.getProvinceDataFromServer();
+		
+		for(ProvinceData prov : lstProvince)
+		{
+			saveProvinceData(prov);
+			List<CityData> lstCity = WeatherHttpDataHelper.getCityDataFromServer(prov.getCode());
+			for(CityData city : lstCity)
+			{
+				saveCityData(city);
+				List<CountyData> lstCounty = WeatherHttpDataHelper.getCountyDataFromServer(city.getCode());
+				for(CountyData county : lstCounty)
+					saveCountyData(county);
+			}
+		}
+		
+		// 用sharedPrefrence来做历史记录,应该不用重新获取了，全国省市县数据一般不会变的
+		SharedPreferences.Editor prefEditor = pref.edit();
+		prefEditor.putString("lastUpdateTime","1");
+		prefEditor.commit();
 	}
 	
 	public List<ProvinceData> getProvinceData()

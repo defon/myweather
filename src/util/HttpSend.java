@@ -14,7 +14,7 @@ public class HttpSend
 	private static int m_ConnectTimeout = 5000;
 	private static int m_ReadTimeout = 5000;
 	
-	public static void sendHttpRequest(final String strUrl,final String strData,final String strMethod,final HttpCallbackListener listener)
+	public static void sendHttpRequestAsynchronous(final String strUrl,final String strData,final String strMethod,final HttpCallbackListener listener)
 	{
 		Thread thrd = new Thread( new Runnable() 
 		{
@@ -55,25 +55,40 @@ public class HttpSend
 		});
 		
 		thrd.start();
+	}
 	
-		// listener为空表示为同步模式，等线程退出再返回
-		if(listener == null)
+	public static String sendHttpRequestSynchronous(final String strUrl,final String strData,final String strMethod)
+	{
+		StringBuilder strResponse = new StringBuilder();
+		HttpURLConnection conn = null;
+		try 
 		{
-			while(true)
-			{
-				if(thrd.isAlive() == false)
-					break;
-				
-				 try 
-				 {
-					 Thread.sleep(1000);
-			     }
-				 catch (InterruptedException e) 
-				 {
-					 e.printStackTrace(); 
-			     }
-			}	
+			URL url = new URL(strUrl);
+			conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod(strMethod);
+			conn.setConnectTimeout(m_ConnectTimeout);
+			conn.setReadTimeout(m_ReadTimeout);
+
+			InputStream in = conn.getInputStream();
+			BufferedReader reader = new BufferedReader(
+					new InputStreamReader(in));
+
+			String strLine;
+
+			while ((strLine = reader.readLine()) != null)
+				strResponse.append(strLine);
 		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		} 
+		finally 
+		{
+			if (conn != null)
+				conn.disconnect();
+		}
+
+		return strResponse.toString();
 	}
 	
 	public static void setConnectionTimeout(int nTimeout)
