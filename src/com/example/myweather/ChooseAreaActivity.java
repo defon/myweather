@@ -13,10 +13,11 @@ import android.widget.TextView;
 
 public class ChooseAreaActivity extends Activity 
 {
+	private MyWeatherDatas m_datas;
 	private TextView m_titleText;
-	private ListView m_areaListView;
 	
-	// listview 数据
+	// listview 数据	
+	private ListView m_areaListView;
 	private ArrayAdapter<String> m_dataAdapter;
 	private List<String> m_dataLst = new ArrayList<String>();
 	
@@ -25,7 +26,7 @@ public class ChooseAreaActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.choose_area);    
+        setContentView(R.layout.choose_area);
         
         m_titleText 	= (TextView)findViewById(R.id.title_text);
         m_areaListView 	= (ListView)findViewById(R.id.area_list_view);
