@@ -8,27 +8,27 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 public class MyWeatherDBHelper extends SQLiteOpenHelper 
 {
 	private static final String CREATE_T_PROVINCE = "create table t_province (" +
-			"id integer primary key autoincrement" +
-			"name text not NULL" + 
-			"code text not NULL";
+			"id integer primary key autoincrement," +
+			"name text not NULL," + 
+			"code text not NULL)";
 	
 	private static final String CREATE_T_CITY = "create table t_city (" +
-			"id integer primary key autoincrement" +
-			"name text not NULL" + 
-			"code text not NULL" + 
-			"province_code text not NULL";
+			"id integer primary key autoincrement," +
+			"name text not NULL," + 
+			"code text not NULL," + 
+			"province_code text not NULL)";
 	
 	private static final String CREATE_T_COUNTY = "create table t_county (" +
-			"id integer primary key autoincrement" +
-			"name text not NULL" + 
-			"code text not NULL" + 
-			"city_code text not NULL";
+			"id integer primary key autoincrement," +
+			"name text not NULL," + 
+			"code text not NULL," + 
+			"city_code text not NULL)";
 	
 	public MyWeatherDBHelper(Context context,String strName,CursorFactory factory,int nVersion)
 	{
 		super(context,strName,factory,nVersion);
 	}
-	
+	 
 	@Override
 	public void onCreate(SQLiteDatabase db)
 	{

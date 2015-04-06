@@ -26,37 +26,47 @@ public class MyWeatherDatas
 	private Context m_SavedContext;
 
 	private MyWeatherDatas(Context context) {
-		MyWeatherDBHelper helper = new MyWeatherDBHelper(context, DB_NAME,
-				null, DB_VERSION);
+		assert(context != null);
+		m_SavedContext = context;
+		MyWeatherDBHelper helper = new MyWeatherDBHelper(context, DB_NAME,null, DB_VERSION);
 		m_db = helper.getWritableDatabase();
 	}
 
 	public synchronized static MyWeatherDatas getInstance(Context context) {
-		if (s_Instance != null)
+		if (s_Instance == null)
 			s_Instance = new MyWeatherDatas(context);
 
 		return s_Instance;
 	}
 
-	public void initData() {
+	public boolean initData(boolean bGetFromServer) {
 		SharedPreferences pref = PreferenceManager
 				.getDefaultSharedPreferences(m_SavedContext);
 		String strLastGetTime = pref.getString("lastUpdateTime", ""); // 如果已经获取过了，跳过
 		if (!strLastGetTime.isEmpty())
-			return;
+			return true;
 
 		List<ProvinceData> lstProvince = getProvinceData();
-		if (lstProvince.isEmpty())
+		if (lstProvince.isEmpty() && bGetFromServer)
 			lstProvince = WeatherHttpDataHelper.getProvinceDataFromServer();
 
+		if(lstProvince.isEmpty())
+			return false;
+		
 		for (ProvinceData prov : lstProvince) {
 			saveProvinceData(prov);
 			List<CityData> lstCity = WeatherHttpDataHelper
 					.getCityDataFromServer(prov.getCode());
+			
+			if(lstCity.isEmpty())	return false;
+			
 			for (CityData city : lstCity) {
 				saveCityData(city);
 				List<CountyData> lstCounty = WeatherHttpDataHelper
 						.getCountyDataFromServer(city.getCode());
+				
+				if(lstCounty.isEmpty())	return false;
+				
 				for (CountyData county : lstCounty)
 					saveCountyData(county);
 			}
@@ -66,6 +76,7 @@ public class MyWeatherDatas
 		SharedPreferences.Editor prefEditor = pref.edit();
 		prefEditor.putString("lastUpdateTime", "1");
 		prefEditor.commit();
+		return true;
 	}
 
 	public List<ProvinceData> getProvinceData() {
