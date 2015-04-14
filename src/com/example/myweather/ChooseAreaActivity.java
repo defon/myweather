@@ -6,6 +6,7 @@ import java.util.List;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -109,12 +110,13 @@ public class ChooseAreaActivity extends Activity
     
     private void init()
     {
-    	showProgressDialog();
+//    	showProgressDialog();
     	Thread thrd = new Thread( new Runnable() 
 		{
 			@Override
 			public void run() 
 			{
+				Log.v("test","123");
 				m_dbDatas.initData(true);
 			}
 		});
@@ -123,16 +125,16 @@ public class ChooseAreaActivity extends Activity
 		
 		boolean bTimeout = false;
 		long lStartTime = System.currentTimeMillis();
-		while(thrd.isAlive())
+//		while(thrd.isAlive())
 		{
-			if(System.currentTimeMillis() - lStartTime > 8000)
+//			if(System.currentTimeMillis() - lStartTime > 8000)
 			{
 				bTimeout = true;
-				break;
+//				break;
 			}
 		}
 		
-		closeProgressDialog();
+//		closeProgressDialog();
     }
     
     private void showProgressDialog()

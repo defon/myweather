@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.example.myweather.CityData;
 import com.example.myweather.CountyData;
@@ -28,7 +29,7 @@ public class WeatherHttpDataHelper
 			
 			for(String p : arrProvinces)
 			{
-				String[] arr = p.split("|");
+				String[] arr = p.split("\\|");
 				if(arr == null || arr.length < 2 || arr[0].isEmpty() || arr[1].isEmpty())
 					continue;
 				
@@ -48,7 +49,7 @@ public class WeatherHttpDataHelper
 		
 		String strUrl = "http://www.weather.com.cn/data/list3/city" + strProvinceCode + ".xml";
 		String strResult = HttpSend.sendHttpRequestSynchronous(strUrl,"",HttpSend.SEND_METHOD_GET);
-		
+
 		do
 		{
 			if(TextUtils.isEmpty(strResult))
@@ -60,7 +61,7 @@ public class WeatherHttpDataHelper
 			
 			for(String p : arrCities)
 			{
-				String[] arr = p.split("|");
+				String[] arr = p.split("\\|");
 				if(arr == null || arr.length < 2 || arr[0].isEmpty() || arr[1].isEmpty())
 					continue;
 				
@@ -93,7 +94,7 @@ public class WeatherHttpDataHelper
 			
 			for(String p : arrCounties)
 			{
-				String[] arr = p.split("|");
+				String[] arr = p.split("\\|");
 				if(arr == null || arr.length < 2 || arr[0].isEmpty() || arr[1].isEmpty())
 					continue;
 				
