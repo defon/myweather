@@ -11,11 +11,14 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import util.WeatherHttpDataHelper;
 
 public class MyWeatherDatas 
 {
-	private static final String DB_NAME = "MyWeatherDB";
+	private static final String LOGTAG = "MyWeatherDatas";
+	
+	private static final String DB_NAME = "myWeather.db";
 
 	private static final int DB_VERSION = 1;
 
@@ -44,7 +47,11 @@ public class MyWeatherDatas
 				.getDefaultSharedPreferences(m_SavedContext);
 		String strLastGetTime = pref.getString("lastUpdateTime", ""); // 如果已经获取过了，跳过
 		if (!strLastGetTime.isEmpty())
+		{
+			//todo
+//			Log.v(LOGTAG,"lastUpdateTime %s,跳过从server获取数据",strLastGetTime);
 			return true;
+		}
 
 		List<ProvinceData> lstProvince = getProvinceData();
 		if (lstProvince.isEmpty() && bGetFromServer)

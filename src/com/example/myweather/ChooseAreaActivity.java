@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ChooseAreaActivity extends Activity 
 {
@@ -50,11 +51,9 @@ public class ChooseAreaActivity extends Activity
         m_areaListView.setAdapter(m_dataAdapter);
         
         m_dbDatas = MyWeatherDatas.getInstance(this);
-
-        init();
-        
         m_nCurLevel = PROVINCE_LEVEL;
-        setProvinceDatas();
+        
+        init();
     }
     
     private void setProvinceDatas()
@@ -110,31 +109,33 @@ public class ChooseAreaActivity extends Activity
     
     private void init()
     {
-//    	showProgressDialog();
+    	showProgressDialog();
     	Thread thrd = new Thread( new Runnable() 
 		{
 			@Override
 			public void run() 
 			{
-				Log.v("test","123");
-				m_dbDatas.initData(true);
+				if(m_dbDatas.initData(true) == true)
+				{
+					runOnUiThread(new Runnable(){
+						public void run(){
+							closeProgressDialog();
+					        setProvinceDatas();							
+						}
+					});
+				}
+				else
+				{
+					runOnUiThread(new Runnable(){
+						public void run(){
+							Toast.makeText(ChooseAreaActivity.this,"Load data failed!",Toast.LENGTH_SHORT).show();
+						}
+					});
+				}
 			}
 		});
 		
 		thrd.start();
-		
-		boolean bTimeout = false;
-		long lStartTime = System.currentTimeMillis();
-//		while(thrd.isAlive())
-		{
-//			if(System.currentTimeMillis() - lStartTime > 8000)
-			{
-				bTimeout = true;
-//				break;
-			}
-		}
-		
-//		closeProgressDialog();
     }
     
     private void showProgressDialog()
@@ -142,7 +143,7 @@ public class ChooseAreaActivity extends Activity
     	if(m_progressDialog == null)
     	{
     		m_progressDialog = new ProgressDialog(this);
-    		m_progressDialog.setMessage("Loading...");
+    		m_progressDialog.setMessage("城市信息加载中，请稍候...");
     		m_progressDialog.setCancelable(false);
     		m_progressDialog.setCanceledOnTouchOutside(false);
     	}
