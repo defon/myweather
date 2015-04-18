@@ -7,14 +7,17 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ChooseAreaActivity extends Activity 
+public class ChooseAreaActivity extends Activity implements OnItemClickListener
 {
 	private static final int PROVINCE_LEVEL = 1;
 	private static final int CITY_LEVEL = 2;
@@ -49,11 +52,41 @@ public class ChooseAreaActivity extends Activity
         m_areaListView 	= (ListView)findViewById(R.id.area_list_view);
         m_dataAdapter 	= new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,m_dataLst);
         m_areaListView.setAdapter(m_dataAdapter);
+        m_areaListView.setOnItemClickListener(this);
         
         m_dbDatas = MyWeatherDatas.getInstance(this);
-        m_nCurLevel = PROVINCE_LEVEL;
-        
         init();
+    }
+    
+    public void onItemClick(AdapterView<?> arg0,View view,int nIndex,long arg3)
+    {
+    	if(m_nCurLevel == PROVINCE_LEVEL)
+    	{
+    		m_selectedProvince = m_provDataLst.get(nIndex);
+    		m_titleText.setText(m_selectedProvince.getName());
+    		setCityDatas(m_selectedProvince.getCode());
+    	}
+    	else if(m_nCurLevel == CITY_LEVEL)
+    	{
+    		m_selectedCity = m_cityDataLst.get(nIndex);
+    		m_titleText.setText(m_selectedCity.getName());    		
+    		setCountyDatas(m_selectedCity.getCode());
+    	}
+    	else if(m_nCurLevel == COUNTY_LEVEL)
+    	{
+    		
+    	}
+    }
+    
+    @Override
+    public void onBackPressed()
+    {
+    	if(m_nCurLevel == CITY_LEVEL)
+    		setProvinceDatas();
+    	else if(m_nCurLevel == COUNTY_LEVEL)
+    		setCityDatas(m_selectedProvince.getCode());
+    	else
+    		finish();
     }
     
     private void setProvinceDatas()
@@ -73,9 +106,9 @@ public class ChooseAreaActivity extends Activity
         }    	
     }
     
-    private void setCityDatas()
+    private void setCityDatas(String strProvinceCode)
     {
-        m_cityDataLst = m_dbDatas.getCityData();
+        m_cityDataLst = m_dbDatas.getCityData(strProvinceCode);
         if(m_cityDataLst.size() > 0)
         {
         	m_dataLst.clear();
@@ -90,9 +123,9 @@ public class ChooseAreaActivity extends Activity
         }    	
     }
     
-    private void setCountyDatas()
+    private void setCountyDatas(String strCityCode)
     {
-        m_countyDataLst = m_dbDatas.getCountyData();
+        m_countyDataLst = m_dbDatas.getCountyData(strCityCode);
         if(m_countyDataLst.size() > 0)
         {
         	m_dataLst.clear();

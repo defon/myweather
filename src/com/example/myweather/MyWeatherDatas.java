@@ -104,11 +104,15 @@ public class MyWeatherDatas
 		return lstResult;
 	}
 
-	public List<CityData> getCityData() {
+	public List<CityData> getCityData(String strProvinceCode) {
 		List<CityData> lstResult = new ArrayList<CityData>();
 
-		Cursor cursor = m_db
-				.query("t_city", null, null, null, null, null, "id");
+		Cursor cursor;
+		if(strProvinceCode.isEmpty())
+			cursor = m_db.query("t_city", null, null, null, null, null, "id");
+		else
+			cursor = m_db.rawQuery("select * from t_city where province_code = ?",new String[] {strProvinceCode});
+			
 		if (cursor.moveToFirst()) {
 			do {
 				CityData city = new CityData();
@@ -124,11 +128,15 @@ public class MyWeatherDatas
 		return lstResult;
 	}
 
-	public List<CountyData> getCountyData() {
+	public List<CountyData> getCountyData(String strCityCode) {
 		List<CountyData> lstResult = new ArrayList<CountyData>();
 
-		Cursor cursor = m_db.query("t_county", null, null, null, null, null,
-				"id");
+		Cursor cursor;
+		if(strCityCode.isEmpty())
+			cursor = m_db.query("t_county", null, null, null, null, null,"id");
+		else
+			cursor = m_db.rawQuery("select * from t_county where city_code = ?",new String[] {strCityCode});
+		
 		if (cursor.moveToFirst()) {
 			do {
 				CountyData county = new CountyData();
