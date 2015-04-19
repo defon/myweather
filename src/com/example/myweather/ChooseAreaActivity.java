@@ -5,14 +5,17 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,7 +58,22 @@ public class ChooseAreaActivity extends Activity implements OnItemClickListener
         m_areaListView.setOnItemClickListener(this);
         
         m_dbDatas = MyWeatherDatas.getInstance(this);
-        init();
+        if(getIntent().getBooleanExtra("fromWeatherActivity",false)) //从weatherActivity跳过来的，没啥说的，直接显示数据
+        	init();
+        else
+        {
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        	String strLastSelect = pref.getString("lastSelect","");
+        	if(!TextUtils.isEmpty(strLastSelect))
+        	{
+        		Intent intent = new Intent(this,WeatherInfo.class);
+        		intent.putExtra("county_code",strLastSelect);
+        		startActivity(intent);
+        		finish();
+        	}
+        	else
+                init();
+        }
     }
     
     public void onItemClick(AdapterView<?> arg0,View view,int nIndex,long arg3)
@@ -74,7 +92,11 @@ public class ChooseAreaActivity extends Activity implements OnItemClickListener
     	}
     	else if(m_nCurLevel == COUNTY_LEVEL)
     	{
-    		
+    		m_selectedCounty = m_countyDataLst.get(nIndex);
+    		Intent intent = new Intent(this,WeatherInfo.class);
+    		intent.putExtra("county_code",m_selectedCounty.getCode());
+    		startActivity(intent);
+    		finish();
     	}
     }
     
@@ -85,8 +107,19 @@ public class ChooseAreaActivity extends Activity implements OnItemClickListener
     		setProvinceDatas();
     	else if(m_nCurLevel == COUNTY_LEVEL)
     		setCityDatas(m_selectedProvince.getCode());
-    	else
+    	else if(getIntent().getBooleanExtra("fromWeatherActivity",false))
+    	{
+    		// 从weatherActivity过来的情况，按返回键时退回
+    		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        	String strLastSelect = pref.getString("lastSelect","");
+        	if(!TextUtils.isEmpty(strLastSelect))
+        	{
+        		Intent intent = new Intent(this,WeatherInfo.class);
+        		intent.putExtra("county_code",strLastSelect);
+        		startActivity(intent);
+        	}
     		finish();
+    	}
     }
     
     private void setProvinceDatas()
