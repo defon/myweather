@@ -107,19 +107,8 @@ public class ChooseAreaActivity extends Activity implements OnItemClickListener
     		setProvinceDatas();
     	else if(m_nCurLevel == COUNTY_LEVEL)
     		setCityDatas(m_selectedProvince.getCode());
-    	else if(getIntent().getBooleanExtra("fromWeatherActivity",false))
-    	{
-    		// 从weatherActivity过来的情况，按返回键时退回
-    		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        	String strLastSelect = pref.getString("lastSelect","");
-        	if(!TextUtils.isEmpty(strLastSelect))
-        	{
-        		Intent intent = new Intent(this,WeatherInfo.class);
-        		intent.putExtra("county_code",strLastSelect);
-        		startActivity(intent);
-        	}
+    	else
     		finish();
-    	}
     }
     
     private void setProvinceDatas()
